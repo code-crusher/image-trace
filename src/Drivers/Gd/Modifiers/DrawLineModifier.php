@@ -38,11 +38,20 @@ class DrawLineModifier extends GenericDrawLineModifier implements SpecializedInt
      * Draw current line on given canvas.
      *
      * @throws ModifierException
+     * @throws ColorDecoderException
+     * @throws StateException
      */
     private function drawLine(GdImage $canvas, int $color): void
     {
         imagealphablending($canvas, true);
-        imageantialias($canvas, true);
+
+        // gd's antialiased line algorithm discards the alpha channel of
+        // the given color and draws all pixels fully opaque. this is
+        // especially visible with old gd versions (<= 2.1.0), where even
+        // horizontal lines are affected (see issue #1349). therefore
+        // antialiasing is only enabled for opaque colors.
+        imageantialias($canvas, !$this->backgroundColor()->isTransparent());
+
         imagesetthickness($canvas, $this->drawable->width());
         imageline(
             $canvas,

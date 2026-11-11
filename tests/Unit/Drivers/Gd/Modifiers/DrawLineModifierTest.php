@@ -25,4 +25,26 @@ final class DrawLineModifierTest extends GdTestCase
         $image->modify(new DrawLineModifier($line));
         $this->assertEquals('b53517', $image->colorAt(0, 0)->toHex());
     }
+
+    public function testApplyTransparent(): void
+    {
+        $image = $this->createTestImage(10, 10)->fill('ff5500');
+        $this->assertColor(255, 85, 0, 255, $image->colorAt(5, 5));
+        $line = new Line(new Point(0, 5), new Point(10, 5), 4);
+        $line->setBackgroundColor('fff4');
+        $image->modify(new DrawLineModifier($line));
+        $this->assertColor(255, 131, 69, 255, $image->colorAt(5, 5), 1);
+    }
+
+    public function testApplyTransparentDiagonal(): void
+    {
+        // gd only discards the alpha channel of antialiased diagonal
+        // lines, so this case is checked separately (see issue #1349)
+        $image = $this->createTestImage(10, 10)->fill('ff5500');
+        $this->assertColor(255, 85, 0, 255, $image->colorAt(5, 5));
+        $line = new Line(new Point(0, 0), new Point(9, 9));
+        $line->setBackgroundColor('fff4');
+        $image->modify(new DrawLineModifier($line));
+        $this->assertColor(255, 131, 69, 255, $image->colorAt(5, 5), 1);
+    }
 }

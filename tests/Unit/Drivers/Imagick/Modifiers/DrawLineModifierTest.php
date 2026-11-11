@@ -35,4 +35,14 @@ final class DrawLineModifierTest extends ImagickTestCase
         $image->modify(new DrawLineModifier($line));
         $this->assertColor(255, 131, 69, 255, $image->colorAt(5, 5));
     }
+
+    public function testApplyTransparentDiagonal(): void
+    {
+        $image = $this->createTestImage(10, 10)->fill('ff5500');
+        $this->assertColor(255, 85, 0, 255, $image->colorAt(5, 5));
+        $line = new Line(new Point(0, 0), new Point(9, 9));
+        $line->setBackgroundColor('fff4');
+        $image->modify(new DrawLineModifier($line));
+        $this->assertColor(255, 131, 69, 255, $image->colorAt(5, 5));
+    }
 }
